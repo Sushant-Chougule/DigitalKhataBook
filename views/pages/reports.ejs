@@ -1,0 +1,99 @@
+<div class="card mb-4">
+    <div class="card-header"><%= __("generate_report") %></div>
+    <div class="card-body">
+        <form action="/reports" method="POST" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label"><%= __("report_type") %></label>
+                <select name="report_type" class="form-select" required>
+                    <option value="transaction"><%= __("transactions") %> <%= __("ledger") %></option>
+                    <option value="balance"><%= __("balance") %> <%= __("reports") %></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label"><%= __("business") %></label>
+                <select name="business_id" class="form-select">
+                    <option value=""><%= __("businesses") %> - <%= __("global_search") %></option>
+                    <% businesses.forEach(b => { %>
+                        <option value="<%= b.id %>"><%= b.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label"><%= __("start_date") %></label>
+                <input type="date" name="start_date" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label"><%= __("end_date") %></label>
+                <input type="date" name="end_date" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100"><%= __("generate") %></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<% if (results) { %>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><%= __("report_results") %></span>
+            <div>
+                <button class="btn btn-sm btn-outline-success me-2" onclick="exportTableToCSV('report.csv')"><i class="bi bi-file-earmark-excel me-2"></i> <%= __("export_excel") %></button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer me-2"></i> <%= __("print") %></button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <% if (report_type === 'transaction') { %>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th><%= __("date") %></th>
+                                <th><%= __("customers") %></th>
+                                <th><%= __("business") %></th>
+                                <th><%= __("type") %></th>
+                                <th><%= __("amount") %></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% results.forEach(t => { %>
+                                <tr>
+                                    <td><%= formatDate(t.date) %></td>
+                                    <td><%= t.customer_name %></td>
+                                    <td><%= __(t.business_name) %></td>
+                                    <td><%= __(t.type) %></td>
+                                    <td class="<%= ['milk_collection', 'customer_payment', 'owner_payment'].includes(t.type) ? 'text-success' : 'text-danger' %>">
+                                        ₹<%= t.amount.toFixed(2) %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else if (report_type === 'balance') { %>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th><%= __("full_name") %></th>
+                                <th><%= __("mobile") %></th>
+                                <th><%= __("balance") %></th>
+                                <th><%= __("status") %></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% results.forEach(c => { %>
+                                <tr>
+                                    <td><%= c.full_name %></td>
+                                    <td><%= c.mobile %></td>
+                                    <td class="<%= c.balance >= 0 ? 'text-success' : 'text-danger' %> fw-bold">₹<%= Math.abs(c.balance).toFixed(2) %></td>
+                                    <td><%= c.balance >= 0 ? __("payable") : __("receivable") %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } %>
+        </div>
+    </div>
+<% } %>

@@ -1,0 +1,83 @@
+<div class="mb-4">
+    <h3><%= __("global_search") %></h3>
+    <form action="/search" method="GET" class="d-flex gap-2">
+        <input type="text" name="q" class="form-control" placeholder="<%= __("search") %>..." value="<%= query %>" required>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search me-2"></i> <%= __("search") %></button>
+    </form>
+</div>
+
+<% if (results) { %>
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light"><%= __("customer_found") %> (<%= results.customers.length %>)</div>       
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th><%= __("full_name") %></th>
+                                    <th><%= __("mobile") %></th>
+                                    <th><%= __("village_city") %></th>
+                                    <th><%= __("balance") %></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% results.customers.forEach(c => { %>
+                                    <tr>
+                                        <td><a href="/customers/<%= c.id %>" class="fw-bold auto-translate"><%= c.full_name %></a></td>
+                                        <td><%= c.mobile %></td>
+                                        <td class="auto-translate"><%= c.village_city %></td>
+                                        <td class="<%= c.balance >= 0 ? 'text-success' : 'text-danger' %> fw-bold">₹<%= Math.abs(c.balance).toFixed(2) %></td>
+                                    </tr>
+                                <% }) %>
+                                <% if (results.customers.length === 0) { %>
+                                    <tr><td colspan="4" class="text-center text-muted py-3">No customers found</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light"><%= __("transactions_found") %> (<%= results.transactions.length %>)</div> 
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th><%= __("date") %></th>
+                                    <th><%= __("customers") %></th>
+                                    <th><%= __("type") %></th>
+                                    <th><%= __("amount") %></th>
+                                    <th><%= __("remarks") %></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% results.transactions.forEach(t => { %>
+                                    <tr>
+                                        <td><%= formatDate(t.date) %></td>
+                                        <td><a href="/customers/<%= t.customer_id %>" class="auto-translate"><%= t.customer_name %></a></td>
+                                        <td><%= __(t.type) %></td>
+                                        <td class="<%= ['milk_collection', 'customer_payment', 'owner_payment'].includes(t.type) ? 'text-success' : 'text-danger' %>">
+                                            ₹<%= t.amount.toFixed(2) %>
+                                        </td>
+                                        <td class="small text-muted auto-translate"><%= t.remarks %></td>
+                                    </tr>
+                                <% }) %>
+                                <% if (results.transactions.length === 0) { %>
+                                    <tr><td colspan="5" class="text-center text-muted py-3">No transactions found</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } else if (query) { %>
+    <div class="alert alert-info">No results found for "<%= query %>"</div>
+<% } %>

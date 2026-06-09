@@ -1,0 +1,207 @@
+<div class="row g-4">
+    <div class="col-md-4">
+        <% if (success) { %>
+            <div class="alert alert-success alert-dismissible fade show">
+                <%= __(success) %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <%= __(error) %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <div class="card mb-4">
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-person-circle text-primary" style="font-size: 5rem;"></i>
+                </div>
+                <h4 class="auto-translate"><%= customer.full_name %></h4>
+                <p class="mb-1 text-muted"><i class="bi bi-hash me-1"></i><%= customer.customer_code %></p>     
+                <p class="text-muted"><i class="bi bi-phone me-1"></i><%= customer.mobile %></p>
+                <div class="p-3 bg-light rounded-3 mb-3 text-dark">
+                    <h6 class="text-muted mb-1"><%= __("current_net_balance") %></h6>
+                    <h3 class="<%= customer.balance >= 0 ? 'text-success' : 'text-danger' %> mb-0">
+                        ₹<%= Math.abs(customer.balance).toFixed(2) %>
+                    </h3>
+                    <small class="fw-medium"><%= customer.balance >= 0 ? __("owner_pays") : __("customer_pays") %></small>
+                </div>
+                <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editCustomerModal">
+                    <i class="bi bi-pencil me-2"></i> <%= __("edit") %> <%= __("customers") %>
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><%= __("business_wise_summary") %></div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <% businessSummary.forEach(s => { %>
+                        <li class="list-group-item d-flex justify-content-between p-3">
+                            <span class="auto-translate"><%= s.business_name || 'Direct / Payments' %></span>
+                            <span class="<%= s.net_amount >= 0 ? 'text-success' : 'text-danger' %> fw-bold">    
+                                ₹<%= Math.abs(s.net_amount).toFixed(2) %>
+                            </span>
+                        </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><%= __("transaction_history") %> / <%= __("ledger") %></span>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-success" onclick="exportTableToCSV('<%= customer.full_name.replace(' ', '_') %>_ledger.csv')"><i class="bi bi-file-earmark-excel me-2"></i> <%= __("export_excel") %></button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer me-2"></i> <%= __("print") %></button>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal"><i class="bi bi-plus-lg me-2"></i> <%= __("add_transaction") %></button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th><%= __("date") %></th>
+                                <th><%= __("business") %></th>
+                                <th><%= __("type") %></th>
+                                <th><%= __("amount") %></th>
+                                <th><%= __("balance") %></th>
+                                <th><%= __("remarks") %></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% transactions.forEach(t => { %>
+                                <tr>
+                                    <td class="small"><%= formatDate(t.date) %></td>
+                                    <td class="auto-translate"><%= t.business_name || 'N/A' %></td>
+                                    <td>
+                                        <span class="badge rounded-pill bg-light text-dark border">
+                                            <%= __(t.type) %>
+                                        </span>
+                                    </td>
+                                    <td class="<%= ['milk_collection', 'customer_payment', 'owner_payment'].includes(t.type) ? 'text-success' : 'text-danger' %>">
+                                        ₹<%= t.amount.toFixed(2) %>
+                                    </td>
+                                    <td class="<%= t.runningBalance >= 0 ? 'text-success' : 'text-danger' %> fw-bold">
+                                        ₹<%= Math.abs(t.runningBalance).toFixed(2) %>
+                                    </td>
+                                    <td class="small text-muted"><%= t.remarks %></td>
+                                </tr>
+                            <% }) %>
+                            <% if (transactions.length === 0) { %>
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No transactions found</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Customer Modal -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><%= __("edit") %> <%= __("customers") %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/customers/edit/<%= customer.id %>" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("customer_code") %></label>
+                        <input type="text" name="customer_code" class="form-control" value="<%= customer.customer_code %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("full_name") %></label>
+                        <input type="text" name="full_name" class="form-control" value="<%= customer.full_name %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("mobile") %></label>
+                        <input type="text" name="mobile" class="form-control" value="<%= customer.mobile %>" required maxlength="10" minlength="10" pattern="\d{10}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("address") %></label>
+                        <textarea name="address" class="form-control" rows="2"><%= customer.address %></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("village_city") %></label>
+                        <input type="text" name="village_city" class="form-control" value="<%= customer.village_city %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("notes") %></label>
+                        <textarea name="notes" class="form-control" rows="2"><%= customer.notes %></textarea>   
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
+                    <button type="submit" class="btn btn-primary"><%= __("save") %></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Transaction Modal (Shortcut) -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><%= __("quick_transaction") %>: <%= customer.full_name %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/transactions/add" method="POST">
+                <input type="hidden" name="customer_id" value="<%= customer.id %>">
+                <input type="hidden" name="redirect_to" value="profile">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("type") %></label>
+                        <select name="type" class="form-select" required>
+                            <option value="milk_collection"><%= __("milk_collection") %> (+)</option>
+                            <option value="grocery_purchase"><%= __("grocery_purchase") %> (-)</option>
+                            <option value="medical_purchase"><%= __("medical_purchase") %> (-)</option>
+                            <option value="hospital_expense"><%= __("hospital_expense") %> (-)</option>
+                            <option value="borrowing"><%= __("borrowing") %> (-)</option>
+                            <option value="owner_payment"><%= __("owner_payment") %> (+)</option>
+                            <option value="customer_payment"><%= __("customer_payment") %> (+)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("business") %></label>
+                        <select name="business_id" class="form-select">
+                            <option value="">None / Cash</option>
+                            <option value="1">Dairy Farm</option>
+                            <option value="2">Grocery Shop</option>
+                            <option value="3">Medical Store</option>
+                            <option value="4">General Hospital</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("amount") %> (₹)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" required placeholder="0.00">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("date") %></label>
+                        <input type="date" name="date" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("remarks") %></label>
+                        <input type="text" name="remarks" class="form-control" placeholder="Optional notes">    
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
+                    <button type="submit" class="btn btn-primary"><%= __("add_transaction") %></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

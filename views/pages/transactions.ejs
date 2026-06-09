@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><%= __("transaction_management") %></h3>
+    <a href="/transactions/add" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i> <%= __("add_transaction") %>
+    </a>
+</div>
+
+<% if (success) { %>
+    <div class="alert alert-success alert-dismissible fade show">
+        <%= __(success) %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th><%= __("date") %></th>
+                        <th><%= __("customers") %></th>
+                        <th><%= __("business") %></th>
+                        <th><%= __("type") %></th>
+                        <th><%= __("amount") %></th>
+                        <th><%= __("remarks") %></th>
+                        <th class="text-end"><%= __("actions") %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% transactions.forEach(t => { %>
+                        <tr>
+                            <td><%= formatDate(t.date) %></td>
+                            <td>
+                                <a href="/customers/<%= t.customer_id %>" class="text-decoration-none fw-bold"><%= t.customer_name %></a>
+                                <div class="small text-muted"><%= t.customer_code %></div>
+                            </td>
+                            <td><%= __(t.business_name) %></td>
+                            <td>
+                                <span class="badge rounded-pill bg-light text-dark border text-uppercase">      
+                                    <%= __(t.type) %>
+                                </span>
+                            </td>
+                            <td class="<%= ['milk_collection', 'customer_payment', 'owner_payment'].includes(t.type) ? 'text-success' : 'text-danger' %> fw-bold">
+                                ₹<%= t.amount.toFixed(2) %>
+                            </td>
+                            <td class="small text-muted"><%= t.remarks %></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('<%= __("delete") %>?')) document.getElementById('del-trans-<%= t.id %>').submit();">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <form id="del-trans-<%= t.id %>" action="/transactions/delete/<%= t.id %>" method="POST" style="display: none;"></form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

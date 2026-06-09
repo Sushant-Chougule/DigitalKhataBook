@@ -1,0 +1,118 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><%= __("business_management") %></h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBusinessModal">
+        <i class="bi bi-plus-circle me-2"></i> <%= __("add_transaction") %>
+    </button>
+</div>
+
+<div class="row g-4">
+    <% businesses.forEach(b => { %>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="icon-box bg-light-primary p-3 rounded-3">
+                            <i class="bi bi-shop h4 mb-0"></i>
+                        </div>
+                        <span class="badge <%= b.status === 'Active' ? 'bg-success' : 'bg-danger' %>"><%= b.status %></span>
+                    </div>
+                    <h5 class="card-title"><%= __(b.name) %></h5>
+                    <h6 class="text-muted small"><%= __(b.type) %></h6>
+                    <p class="card-text small text-muted mt-2 auto-translate"><%= b.description %></p>
+                </div>
+                <div class="card-footer bg-white border-0 p-3">
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBusinessModal<%= b.id %>">
+                        <i class="bi bi-pencil me-1"></i> <%= __("edit") %>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('<%= __("delete") %>?')) document.getElementById('delete-form-b-<%= b.id %>').submit();">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <form id="delete-form-b-<%= b.id %>" action="/businesses/delete/<%= b.id %>" method="POST" style="display: none;"></form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Business Modal -->
+        <div class="modal fade" id="editBusinessModal<%= b.id %>" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("edit") %> <%= __("business") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/businesses/edit/<%= b.id %>" method="POST">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label"><%= __("business_name") %></label>
+                                <input type="text" name="name" class="form-control" value="<%= b.name %>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><%= __("type") %></label>
+                                <select name="type" class="form-select">
+                                    <option value="Dairy Farm" <%= b.type === 'Dairy Farm' ? 'selected' : '' %>><%= __("Dairy Farm") %></option>
+                                    <option value="Grocery Shop" <%= b.type === 'Grocery Shop' ? 'selected' : '' %>><%= __("Grocery Shop") %></option>
+                                    <option value="Medical Store" <%= b.type === 'Medical Store' ? 'selected' : '' %>><%= __("Medical Store") %></option>
+                                    <option value="Hospital" <%= b.type === 'Hospital' ? 'selected' : '' %>><%= __("Hospital") %></option>
+                                    <option value="Other" <%= b.type === 'Other' ? 'selected' : '' %>><%= __("Other") %></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><%= __("status") %></label>
+                                <select name="status" class="form-select">
+                                    <option value="Active" <%= b.status === 'Active' ? 'selected' : '' %>>Active</option>
+                                    <option value="Inactive" <%= b.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><%= __("description") %></label>
+                                <textarea name="description" class="form-control" rows="2"><%= b.description %></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
+                            <button type="submit" class="btn btn-primary"><%= __("update_profile") %></button>  
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+</div>
+
+<!-- Add Business Modal -->
+<div class="modal fade" id="addBusinessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><%= __("add_transaction") %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/businesses/add" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("business_name") %></label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("type") %></label>
+                        <select name="type" class="form-select">
+                            <option value="Dairy Farm"><%= __("Dairy Farm") %></option>
+                            <option value="Grocery Shop"><%= __("Grocery Shop") %></option>
+                            <option value="Medical Store"><%= __("Medical Store") %></option>
+                            <option value="Hospital"><%= __("Hospital") %></option>
+                            <option value="Other"><%= __("Other") %></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("description") %></label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
+                    <button type="submit" class="btn btn-primary"><%= __("save_business") %></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

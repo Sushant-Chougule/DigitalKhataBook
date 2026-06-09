@@ -1,0 +1,116 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><%= __("customer_management") %></h3>
+    <div class="d-flex gap-2">
+        <input type="text" id="customerSearch" class="form-control" placeholder="<%= __("search") %>..." style="width: 300px;">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            <i class="bi bi-person-plus me-2"></i> <%= __("add_new_customer") %>
+        </button>
+    </div>
+</div>
+
+<% if (success) { %>
+    <div class="alert alert-success alert-dismissible fade show">
+        <%= __(success) %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+<% if (error) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
+        <%= __(error) %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<script>
+    document.getElementById('customerSearch').addEventListener('keyup', function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().indexOf(value) > -1 ? '' : 'none';
+        });
+    });
+</script>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th><%= __("customer_code") %></th>
+                        <th><%= __("full_name") %></th>
+                        <th><%= __("mobile") %></th>
+                        <th><%= __("village_city") %></th>
+                        <th><%= __("balance") %></th>
+                        <th class="text-end"><%= __("actions") %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% customers.forEach(c => { %>
+                        <tr>
+                            <td><span class="badge bg-light text-primary border"><%= c.customer_code %></span></td>
+                            <td>
+                                <a href="/customers/<%= c.id %>" class="text-decoration-none fw-bold auto-translate"><%= c.full_name %></a>
+                            </td>
+                            <td><%= c.mobile %></td>
+                            <td class="auto-translate"><%= c.village_city %></td>
+                            <td>
+                                <span class="<%= c.balance >= 0 ? 'text-success' : 'text-danger' %> fw-bold">   
+                                    ₹<%= Math.abs(c.balance).toFixed(2) %>
+                                    <small class="text-muted"><%= c.balance >= 0 ? '(' + __("payable") + ')' : '(' + __("receivable") + ')' %></small>
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="/customers/<%= c.id %>" class="btn btn-sm btn-outline-info me-2"><i class="bi bi-eye"></i></a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('<%= __("delete") %>?')) document.getElementById('delete-form-<%= c.id %>').submit();">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <form id="delete-form-<%= c.id %>" action="/customers/delete/<%= c.id %>" method="POST" style="display: none;"></form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><%= __("add_new_customer") %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/customers/add" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("full_name") %></label>
+                        <input type="text" name="full_name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("mobile") %> (10 digits)</label>
+                        <input type="text" name="mobile" class="form-control" required maxlength="10" minlength="10" pattern="\d{10}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("address") %></label>
+                        <textarea name="address" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("village_city") %></label>
+                        <input type="text" name="village_city" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("notes") %></label>
+                        <textarea name="notes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>     
+                    <button type="submit" class="btn btn-primary"><%= __("save_customer") %></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

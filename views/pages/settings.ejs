@@ -1,0 +1,87 @@
+<div class="row">
+    <div class="col-md-6">
+        <% if (success) { %>
+            <div class="alert alert-success alert-dismissible fade show">
+                <%= success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <div class="card mb-4">
+            <div class="card-header"><%= __("admin_profile") %></div>
+            <div class="card-body">
+                <form action="/settings/profile" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("full_name") %></label>
+                        <input type="text" name="full_name" class="form-control" value="<%= user.full_name %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("username") %></label>
+                        <input type="text" name="username" class="form-control" value="<%= user.username %>" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><%= __("update_profile") %></button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header text-danger"><%= __("change_password") %></div>
+            <div class="card-body">
+                <form action="/settings/password" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("old_password") %></label>
+                        <input type="password" name="old_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("new_password") %></label>
+                        <input type="password" name="new_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><%= __("confirm_password") %></label>
+                        <input type="password" name="confirm_password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger"><%= __("change_password") %></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><%= __("app_info") %></div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong><%= __("version") %>:</strong></td>
+                        <td>1.0.0</td>
+                    </tr>
+                    <tr>
+                        <td><strong><%= __("environment") %>:</strong></td>
+                        <td>Production (Local)</td>
+                    </tr>
+                    <tr>
+                        <td><strong><%= __("database") %>:</strong></td>
+                        <td>SQLite 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong><%= __("server_status") %>:</strong></td>
+                        <td><span class="badge bg-success">Online</span></td>
+                    </tr>
+                </table>
+                <hr>
+                <h6>Quick Tips:</h6>
+                <ul>
+                    <li>Use the <strong><%= __("global_search") %></strong> to find anything.</li>
+                    <li>The <strong><%= __("reports") %></strong> section can be printed or saved as PDF.</li>
+                    <li>Balances are updated instantly after every transaction.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

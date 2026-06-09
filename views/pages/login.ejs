@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="<%= currentLang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= __("login") %> - DigitalKhataBook</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: 'Inter', sans-serif; flex-direction: column; }
+        .login-card { width: 100%; max-width: 400px; padding: 2rem; border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white; }
+        .login-card h2 { font-weight: 700; color: #333; margin-bottom: 1.5rem; }
+        .btn-primary { padding: 0.8rem; border-radius: 10px; font-weight: 600; }
+        .form-control { padding: 0.8rem; border-radius: 10px; }
+        .lang-switch { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="lang-switch btn-group shadow-sm">
+        <a href="/change-lang/en" class="btn btn-sm <%= currentLang === 'en' ? 'btn-primary' : 'btn-outline-primary' %>">EN</a>
+        <a href="/change-lang/mr" class="btn btn-sm <%= currentLang === 'mr' ? 'btn-primary' : 'btn-outline-primary' %>">मराठी</a>
+    </div>
+
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <i class="bi bi-book-half text-primary" style="font-size: 3rem;"></i>
+            <h2 class="mt-2">DigitalKhata</h2>
+            <p class="text-muted">Manage your business accounts easily</p>
+        </div>
+
+        <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+
+        <form action="/login" method="POST">
+            <div class="mb-3">
+                <label class="form-label"><%= __("username") %></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                    <input type="text" name="username" class="form-control" required placeholder="<%= __("username") %>">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label"><%= __("password") %></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" class="form-control" required placeholder="<%= __("password") %>">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100"><%= __("login") %></button>
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">Default Admin: admin / admin123</small>
+        </div>
+    </div>
+</body>
+</html>
