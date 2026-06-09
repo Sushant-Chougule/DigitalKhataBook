@@ -157,6 +157,7 @@ A "Commit" is a snapshot of your work. Use clear messages so you know what you d
 *   `git commit -m "update"`
 *   `git commit -m "asdasd"`
 
+(Added for testing commit)
 ---
 
 ## SECTION 10: PUSH CHANGES
