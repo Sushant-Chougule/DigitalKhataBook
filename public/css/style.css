@@ -180,12 +180,13 @@ body.dark-theme .table {
 body.dark-theme .table thead th {
     background-color: #0f172a !important;
     border-bottom: 1px solid #334155 !important;
-    color: #94a3b8 !important;
+    color: #cbd5e1 !important;
 }
 
 body.dark-theme .table tbody td {
     border-bottom: 1px solid #334155 !important;
     background-color: transparent !important;
+    color: #cbd5e1 !important;
 }
 
 body.dark-theme .table-hover tbody tr:hover {
@@ -233,6 +234,10 @@ body.dark-theme .text-dark {
     color: #f1f5f9 !important;
 }
 
+body.dark-theme label {
+    color: #cbd5e1 !important;
+}
+
 body.dark-theme .alert {
     background-color: var(--dark-card) !important;
     color: #f1f5f9 !important;
@@ -243,6 +248,14 @@ body.dark-theme .input-group-text {
     background-color: #334155 !important;
     color: #f1f5f9 !important;
     border-color: #475569 !important;
+}
+
+body.dark-theme small, body.dark-theme .small {
+    color: #94a3b8 !important;
+}
+
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3, body.dark-theme h4, body.dark-theme h5, body.dark-theme h6 {
+    color: #f1f5f9 !important;
 }
 
 body.dark-theme .bg-light-primary { background-color: rgba(67, 97, 238, 0.15) !important; color: #818cf8 !important; }

@@ -16,7 +16,7 @@
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+                <thead class="bg-light text-dark">
                     <tr>
                         <th><%= __("date") %></th>
                         <th><%= __("customers") %></th>
@@ -37,15 +37,18 @@
                             </td>
                             <td><%= __(t.business_name) %></td>
                             <td>
-                                <span class="badge rounded-pill bg-light text-dark border text-uppercase">      
+                                <span class="badge rounded-pill bg-light text-dark border text-uppercase">
                                     <%= __(t.type) %>
                                 </span>
                             </td>
-                            <td class="<%= ['milk_collection', 'customer_payment', 'owner_payment'].includes(t.type) ? 'text-success' : 'text-danger' %> fw-bold">
+                            <td class="<%= ['milk_collection', 'customer_payment', 'owner_payment', 'settlement'].includes(t.type) ? 'text-success' : 'text-danger' %> fw-bold">
                                 ₹<%= t.amount.toFixed(2) %>
                             </td>
                             <td class="small text-muted"><%= t.remarks %></td>
                             <td class="text-end">
+                                <a href="/transactions/edit/<%= t.id %>" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('<%= __("delete") %>?')) document.getElementById('del-trans-<%= t.id %>').submit();">
                                     <i class="bi bi-trash"></i>
                                 </button>

@@ -39,6 +39,7 @@
   "borrowing": "उधारी",
   "owner_payment": "मालकाने दिलेली रक्कम",
   "customer_payment": "ग्राहकाने भरलेली रक्कम",
+  "settlement": "सेटलमेंट (पुर्ण भरणा)",
   "payable": "देय",
   "receivable": "येणे",
   "owner_payable": "मालकाचे देणे",

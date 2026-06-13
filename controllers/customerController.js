@@ -21,7 +21,7 @@ exports.getProfile = (req, res) => {
 
     let runningBalance = 0;
     const transactionsWithBalance = transactions.map(t => {
-        if (['milk_collection', 'owner_payment', 'customer_payment'].includes(t.type)) {
+        if (['milk_collection', 'owner_payment', 'customer_payment', 'settlement'].includes(t.type)) {
             runningBalance += t.amount;
         } else {
             runningBalance -= t.amount;
@@ -34,7 +34,7 @@ exports.getProfile = (req, res) => {
     const businessSummary = db.prepare(`
         SELECT b.name as business_name,
                SUM(CASE
-                   WHEN t.type IN ('milk_collection', 'owner_payment', 'customer_payment') THEN t.amount
+                   WHEN t.type IN ('milk_collection', 'owner_payment', 'customer_payment', 'settlement') THEN t.amount
                    ELSE -t.amount END) as net_amount
         FROM transactions t
         LEFT JOIN businesses b ON t.business_id = b.id
@@ -63,7 +63,7 @@ exports.add = (req, res) => {
         const countRes = db.prepare("SELECT COUNT(*) as total FROM customers").get();
         const nextNum = (countRes ? countRes.total : 0) + 1;
         let code = 'CUS' + nextNum.toString().padStart(4, '0');
-        
+
         while (db.prepare('SELECT id FROM customers WHERE customer_code = ?').get(code)) {
             code = 'CUS' + (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
         }
@@ -80,17 +80,18 @@ exports.add = (req, res) => {
 
 exports.edit = (req, res) => {
     const id = req.params.id;
-    const { full_name, mobile, address, village_city, notes, customer_code } = req.body;
+    const { full_name, mobile, address, village_city, notes } = req.body;
 
     if (!mobile || mobile.length !== 10 || isNaN(mobile)) {
         return res.redirect(`/customers/${id}?error=err_mobile_10`);
     }
 
     try {
-        const result = db.prepare('UPDATE customers SET full_name = ?, mobile = ?, address = ?, village_city = ?, notes = ?, customer_code = ? WHERE id = ?').run(
-            full_name, mobile, address, village_city, notes, customer_code, id
+        // Removed customer_code from the update query to make it immutable
+        const result = db.prepare('UPDATE customers SET full_name = ?, mobile = ?, address = ?, village_city = ?, notes = ? WHERE id = ?').run(
+            full_name, mobile, address, village_city, notes, id
         );
-        
+
         if (result.changes > 0) {
             res.redirect(`/customers/${id}?success=success_update`);
         } else {
@@ -117,7 +118,7 @@ exports.apiGetCustomer = (req, res) => {
         const businessSummary = db.prepare(`
             SELECT b.name as business_name,
                    SUM(CASE
-                       WHEN t.type IN ('milk_collection', 'owner_payment', 'customer_payment') THEN t.amount
+                       WHEN t.type IN ('milk_collection', 'owner_payment', 'customer_payment', 'settlement') THEN t.amount
                        ELSE -t.amount END) as net_amount
             FROM transactions t
             LEFT JOIN businesses b ON t.business_id = b.id
