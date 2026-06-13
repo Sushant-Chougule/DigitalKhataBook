@@ -9,7 +9,7 @@ exports.getIndex = (req, res) => {
     const ownerReceivable = db.prepare('SELECT ABS(SUM(balance)) as total FROM customers WHERE balance < 0').get().total || 0;
 
     const recentTransactions = db.prepare(`
-        SELECT t.*, c.full_name as customer_name, b.name as business_name 
+        SELECT t.*, c.full_name as customer_name, b.name as business_name
         FROM transactions t
         JOIN customers c ON t.customer_id = c.id
         LEFT JOIN businesses b ON t.business_id = b.id
@@ -20,20 +20,11 @@ exports.getIndex = (req, res) => {
 
     // Data for Business-wise Revenue (Chart)
     const businessStats = db.prepare(`
-        SELECT b.name, SUM(ABS(t.amount)) as total 
-        FROM transactions t 
-        JOIN businesses b ON t.business_id = b.id 
+        SELECT b.name, SUM(ABS(t.amount)) as total
+        FROM transactions t
+        JOIN businesses b ON t.business_id = b.id
         GROUP BY b.id
     `).all();
-
-    // Notifications: High payable/receivable
-    const notifications = [];
-    if (ownerPayable > 10000) notifications.push({ type: 'warning', message: 'High total payable amount detected!' });
-    
-    const highDebtCustomers = db.prepare('SELECT full_name, balance FROM customers WHERE balance < -5000').all();
-    highDebtCustomers.forEach(c => {
-        notifications.push({ type: 'danger', message: `Customer ${c.full_name} has a high debt of ₹${Math.abs(c.balance)}` });
-    });
 
     res.render('pages/dashboard', {
         title: 'Dashboard',
@@ -46,7 +37,6 @@ exports.getIndex = (req, res) => {
         },
         recentTransactions,
         topCustomers,
-        businessStats,
-        notifications
+        businessStats
     });
 };

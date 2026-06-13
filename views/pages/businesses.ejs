@@ -5,6 +5,13 @@
     </button>
 </div>
 
+<% if (locals.error) { %>
+    <div class="alert alert-danger alert-dismissible fade show"><%= error %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<% } %>
+<% if (locals.success) { %>
+    <div class="alert alert-success alert-dismissible fade show"><%= success %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<% } %>
+
 <div class="row g-4">
     <% businesses.forEach(b => { %>
         <div class="col-md-4">
@@ -18,16 +25,28 @@
                     </div>
                     <h5 class="card-title"><%= __(b.name) %></h5>
                     <h6 class="text-muted small"><%= __(b.type) %></h6>
+                    <hr>
+                    <div class="small mb-2">
+                        <strong><%= __("type") %>:</strong> <span class="badge bg-info text-dark"><%= b.transaction_type_name %></span>
+                    </div>
+                    <div class="small mb-2">
+                        <strong>Impact:</strong> 
+                        <span class="badge <%= b.balance_impact === 'Credit' ? 'bg-success' : 'bg-danger' %>">
+                            <%= b.balance_impact %> (<%= b.balance_impact === 'Credit' ? '+' : '-' %>)
+                        </span>
+                    </div>
                     <p class="card-text small text-muted mt-2 auto-translate"><%= b.description %></p>
                 </div>
                 <div class="card-footer bg-white border-0 p-3">
                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editBusinessModal<%= b.id %>">
                         <i class="bi bi-pencil me-1"></i> <%= __("edit") %>
                     </button>
+                    <% if (b.name !== 'Cash') { %>
                     <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('<%= __("delete") %>?')) document.getElementById('delete-form-b-<%= b.id %>').submit();">
                         <i class="bi bi-trash"></i>
                     </button>
                     <form id="delete-form-b-<%= b.id %>" action="/businesses/delete/<%= b.id %>" method="POST" style="display: none;"></form>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -36,15 +55,29 @@
         <div class="modal fade" id="editBusinessModal<%= b.id %>" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header bg-light">
                         <h5 class="modal-title"><%= __("edit") %> <%= __("business") %></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form action="/businesses/edit/<%= b.id %>" method="POST">
-                        <div class="modal-body">
+                        <div class="modal-body text-dark">
                             <div class="mb-3">
                                 <label class="form-label"><%= __("business_name") %></label>
-                                <input type="text" name="name" class="form-control" value="<%= b.name %>" required>
+                                <input type="text" name="name" class="form-control" value="<%= b.name %>" required <%= b.name === 'Cash' ? 'readonly' : '' %>>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Transaction Type Name (Unique)</label>
+                                <input type="text" name="transaction_type_name" class="form-control" value="<%= b.transaction_type_name %>" required <%= b.name === 'Cash' ? 'readonly' : '' %>>
+                                <small class="text-muted">Example: Milk Collection</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Balance Impact</label>
+                                <select name="balance_impact" class="form-select" required <%= b.name === 'Cash' ? 'disabled' : '' %>>
+                                    <option value="Credit" <%= b.balance_impact === 'Credit' ? 'selected' : '' %>>Credit (+)</option>
+                                    <option value="Debit" <%= b.balance_impact === 'Debit' ? 'selected' : '' %>>Debit (-)</option>
+                                    <% if (b.name === 'Cash') { %><option value="Mixed" selected>Mixed</option><% } %>
+                                </select>
+                                <% if (b.name === 'Cash') { %><input type="hidden" name="balance_impact" value="Mixed"><% } %>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label"><%= __("type") %></label>
@@ -70,7 +103,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
-                            <button type="submit" class="btn btn-primary"><%= __("update_profile") %></button>  
+                            <button type="submit" class="btn btn-primary"><%= __("update_profile") %></button>
                         </div>
                     </form>
                 </div>
@@ -83,24 +116,36 @@
 <div class="modal fade" id="addBusinessModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><%= __("add_transaction") %></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Create New Business</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="/businesses/add" method="POST">
-                <div class="modal-body">
+                <div class="modal-body text-dark">
                     <div class="mb-3">
-                        <label class="form-label"><%= __("business_name") %></label>
-                        <input type="text" name="name" class="form-control" required>
+                        <label class="form-label">Business Name</label>
+                        <input type="text" name="name" class="form-control" required placeholder="e.g. Animal Feed Shop">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><%= __("type") %></label>
+                        <label class="form-label">Transaction Type Name (Shown in Dropdown)</label>
+                        <input type="text" name="transaction_type_name" class="form-control" required placeholder="e.g. Feed Purchase">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Balance Impact</label>
+                        <select name="balance_impact" class="form-select" required>
+                            <option value="">Select Impact</option>
+                            <option value="Credit">Credit (+) - Increases Balance</option>
+                            <option value="Debit">Debit (-) - Decreases Balance</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Business Category</label>
                         <select name="type" class="form-select">
-                            <option value="Dairy Farm"><%= __("Dairy Farm") %></option>
-                            <option value="Grocery Shop"><%= __("Grocery Shop") %></option>
-                            <option value="Medical Store"><%= __("Medical Store") %></option>
-                            <option value="Hospital"><%= __("Hospital") %></option>
-                            <option value="Other"><%= __("Other") %></option>
+                            <option value="Dairy Farm">Dairy Farm</option>
+                            <option value="Grocery Shop">Grocery Shop</option>
+                            <option value="Medical Store">Medical Store</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -110,7 +155,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
-                    <button type="submit" class="btn btn-primary"><%= __("save_business") %></button>
+                    <button type="submit" class="btn btn-primary"><%= __("save") %></button>
                 </div>
             </form>
         </div>

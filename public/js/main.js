@@ -33,10 +33,24 @@ document.addEventListener('DOMContentLoaded', function () {
     alerts.forEach(function(alert) {
         setTimeout(function() {
             const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
+            if (bsAlert) bsAlert.close();
         }, 5000);
     });
+
+    // Clear URL query parameters AFTER a small delay to allow view logic to catch them if needed,
+    // though here we do it immediately after DOM is ready.
+    if (window.location.search.includes('success=') || window.location.search.includes('error=')) {
+        const url = new URL(window.location);
+        url.searchParams.delete('success');
+        url.searchParams.delete('error');
+        window.history.replaceState({}, '', url);
+    }
 });
+
+// Helper for destructive action confirmation
+function confirmAction(message = "Are you sure you want to proceed?") {
+    return confirm(message);
+}
 
 // Helper for exporting table to CSV (Excel)
 function exportTableToCSV(filename) {
@@ -45,10 +59,10 @@ function exportTableToCSV(filename) {
 
     let csv = [];
     const rows = table.querySelectorAll("tr");
-    
-    for (let i = 0; i < rows.size; i++) {
+
+    for (let i = 0; i < rows.length; i++) {
         let row = [], cols = rows[i].querySelectorAll("td, th");
-        
+
         for (let j = 0; j < cols.length; j++) {
             // Clean text and handle commas
             let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/(\s\s+)/gm, " ");

@@ -39,6 +39,7 @@
   "borrowing": "Borrowing",
   "owner_payment": "Owner Payment",
   "customer_payment": "Customer Payment",
+  "settlement": "Settlement",
   "payable": "Payable",
   "receivable": "Receivable",
   "owner_payable": "Owner Payable",

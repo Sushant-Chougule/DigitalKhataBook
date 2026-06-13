@@ -35,7 +35,7 @@
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+                <thead class="bg-light text-dark">
                     <tr>
                         <th><%= __("customer_code") %></th>
                         <th><%= __("full_name") %></th>
@@ -55,7 +55,7 @@
                             <td><%= c.mobile %></td>
                             <td class="auto-translate"><%= c.village_city %></td>
                             <td>
-                                <span class="<%= c.balance >= 0 ? 'text-success' : 'text-danger' %> fw-bold">   
+                                <span class="<%= c.balance >= 0 ? 'text-success' : 'text-danger' %> fw-bold">
                                     ₹<%= Math.abs(c.balance).toFixed(2) %>
                                     <small class="text-muted"><%= c.balance >= 0 ? '(' + __("payable") + ')' : '(' + __("receivable") + ')' %></small>
                                 </span>
@@ -84,7 +84,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="/customers/add" method="POST">
-                <div class="modal-body">
+                <div class="modal-body text-dark">
                     <div class="mb-3">
                         <label class="form-label"><%= __("full_name") %></label>
                         <input type="text" name="full_name" class="form-control" required>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>     
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("cancel") %></button>
                     <button type="submit" class="btn btn-primary"><%= __("save_customer") %></button>
                 </div>
             </form>
